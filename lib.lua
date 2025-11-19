@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local Library = {}
+local Library = {Elements = {}}
 Library.__index = Library
 
 -- Safe utility functions
@@ -67,7 +67,7 @@ function Library:CreateWindow(config)
         })
     end
     
-    -- Safe toggle function
+    -- Fixed toggle function
     function window:Toggle()
         self.IsOpen = not self.IsOpen
         if self.MainFrame then
@@ -76,10 +76,12 @@ function Library:CreateWindow(config)
             if self.Title then self.Title.Visible = self.IsOpen end
         end
         
-        -- Safe page visibility update
+        -- Fixed page visibility update - removed the extra page parameter
         for _, page in pairs(self.Pages) do
             if page and type(page.UpdateVisibility) == "function" then
-                pcall(page.UpdateVisibility, page, self.IsOpen)
+                pcall(function()
+                    page:UpdateVisibility(self.IsOpen)
+                end)
             end
         end
     end
