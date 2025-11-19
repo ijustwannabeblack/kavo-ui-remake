@@ -54,10 +54,11 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     espPreview.Name = "ESPPreview"
     espPreview.BackgroundColor3 = theme.Header or Color3.fromRGB(28, 29, 34)
     espPreview.BorderSizePixel = 0
-    espPreview.Size = UDim2.new(0, 180, 0, 220)
+    espPreview.Size = UDim2.new(0, 200, 0, 250)
     espPreview.Position = UDim2.new(1, 10, 0, 0)
     espPreview.Parent = parentFrame
-    espPreview.Visible = false
+    espPreview.Visible = true
+    espPreview.ZIndex = 10
     
     local previewCorner = Instance.new("UICorner")
     previewCorner.CornerRadius = UDim.new(0, 4)
@@ -65,36 +66,95 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     
     local previewTitle = Instance.new("TextLabel")
     previewTitle.Name = "PreviewTitle"
-    previewTitle.BackgroundTransparency = 1
-    previewTitle.Position = UDim2.new(0, 0, 0, 5)
-    previewTitle.Size = UDim2.new(1, 0, 0, 20)
+    previewTitle.BackgroundColor3 = theme.SchemeColor or Color3.fromRGB(74, 99, 135)
+    previewTitle.Size = UDim2.new(1, 0, 0, 25)
     previewTitle.Font = Enum.Font.Gotham
     previewTitle.Text = "ESP Preview"
     previewTitle.TextColor3 = theme.TextColor or Color3.fromRGB(255, 255, 255)
     previewTitle.TextSize = 14
     previewTitle.Parent = espPreview
     
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 4)
+    titleCorner.Parent = previewTitle
+    
     -- Preview area
     local previewArea = Instance.new("Frame")
     previewArea.Name = "PreviewArea"
-    previewArea.BackgroundColor3 = theme.Background or Color3.fromRGB(36, 37, 43)
+    previewArea.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
     previewArea.Position = UDim2.new(0.05, 0, 0.15, 0)
-    previewArea.Size = UDim2.new(0.9, 0, 0.6, 0)
+    previewArea.Size = UDim2.new(0.9, 0, 0.55, 0)
     previewArea.Parent = espPreview
     
     local areaCorner = Instance.new("UICorner")
     areaCorner.CornerRadius = UDim.new(0, 4)
     areaCorner.Parent = previewArea
     
-    -- Minecraft skeleton representation
-    local skeleton = Instance.new("Frame")
-    skeleton.Name = "Skeleton"
-    skeleton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    skeleton.BorderSizePixel = 0
-    skeleton.AnchorPoint = Vector2.new(0.5, 0.5)
-    skeleton.Position = UDim2.new(0.5, 0, 0.5, 0)
-    skeleton.Size = UDim2.new(0, 40, 0, 80)
-    skeleton.Parent = previewArea
+    -- Minecraft skeleton image representation
+    local skeletonContainer = Instance.new("Frame")
+    skeletonContainer.Name = "SkeletonContainer"
+    skeletonContainer.BackgroundTransparency = 1
+    skeletonContainer.Size = UDim2.new(1, 0, 1, 0)
+    skeletonContainer.Parent = previewArea
+    
+    -- Create a simple representation of the Minecraft skeleton
+    -- Head
+    local head = Instance.new("Frame")
+    head.Name = "Head"
+    head.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    head.BorderSizePixel = 0
+    head.AnchorPoint = Vector2.new(0.5, 0)
+    head.Position = UDim2.new(0.5, 0, 0.1, 0)
+    head.Size = UDim2.new(0, 30, 0, 30)
+    head.Parent = skeletonContainer
+    
+    -- Body
+    local body = Instance.new("Frame")
+    body.Name = "Body"
+    body.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+    body.BorderSizePixel = 0
+    body.AnchorPoint = Vector2.new(0.5, 0)
+    body.Position = UDim2.new(0.5, 0, 0.35, 0)
+    body.Size = UDim2.new(0, 20, 0, 40)
+    body.Parent = skeletonContainer
+    
+    -- Arms
+    local leftArm = Instance.new("Frame")
+    leftArm.Name = "LeftArm"
+    leftArm.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+    leftArm.BorderSizePixel = 0
+    leftArm.AnchorPoint = Vector2.new(1, 0)
+    leftArm.Position = UDim2.new(0.5, -10, 0.35, 0)
+    leftArm.Size = UDim2.new(0, 15, 0, 35)
+    leftArm.Parent = skeletonContainer
+    
+    local rightArm = Instance.new("Frame")
+    rightArm.Name = "RightArm"
+    rightArm.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+    rightArm.BorderSizePixel = 0
+    rightArm.AnchorPoint = Vector2.new(0, 0)
+    rightArm.Position = UDim2.new(0.5, 10, 0.35, 0)
+    rightArm.Size = UDim2.new(0, 15, 0, 35)
+    rightArm.Parent = skeletonContainer
+    
+    -- Legs
+    local leftLeg = Instance.new("Frame")
+    leftLeg.Name = "LeftLeg"
+    leftLeg.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
+    leftLeg.BorderSizePixel = 0
+    leftLeg.AnchorPoint = Vector2.new(1, 0)
+    leftLeg.Position = UDim2.new(0.5, -5, 0.7, 0)
+    leftLeg.Size = UDim2.new(0, 10, 0, 30)
+    leftLeg.Parent = skeletonContainer
+    
+    local rightLeg = Instance.new("Frame")
+    rightLeg.Name = "RightLeg"
+    rightLeg.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
+    rightLeg.BorderSizePixel = 0
+    rightLeg.AnchorPoint = Vector2.new(0, 0)
+    rightLeg.Position = UDim2.new(0.5, 5, 0.7, 0)
+    rightLeg.Size = UDim2.new(0, 10, 0, 30)
+    rightLeg.Parent = skeletonContainer
     
     -- ESP elements (initially hidden)
     local boxESP = Instance.new("Frame")
@@ -102,105 +162,191 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     boxESP.BackgroundTransparency = 1
     boxESP.BorderColor3 = Color3.fromRGB(0, 255, 0)
     boxESP.BorderSizePixel = 2
-    boxESP.Size = UDim2.new(1.2, 0, 1.5, 0)
+    boxESP.Size = UDim2.new(1.3, 0, 1.8, 0)
     boxESP.AnchorPoint = Vector2.new(0.5, 0.5)
     boxESP.Position = UDim2.new(0.5, 0, 0.5, 0)
     boxESP.Visible = false
-    boxESP.Parent = skeleton
+    boxESP.ZIndex = 5
+    boxESP.Parent = skeletonContainer
     
     local nameTag = Instance.new("TextLabel")
     nameTag.Name = "NameTag"
     nameTag.BackgroundTransparency = 1
-    nameTag.Position = UDim2.new(0, 0, -0.3, 0)
+    nameTag.Position = UDim2.new(0, 0, -0.2, 0)
     nameTag.Size = UDim2.new(1, 0, 0, 15)
-    nameTag.Font = Enum.Font.Gotham
+    nameTag.Font = Enum.Font.GothamBold
     nameTag.Text = "Skeleton"
     nameTag.TextColor3 = Color3.fromRGB(255, 255, 255)
-    nameTag.TextSize = 10
+    nameTag.TextSize = 12
+    nameTag.TextStrokeTransparency = 0
     nameTag.Visible = false
-    nameTag.Parent = skeleton
+    nameTag.ZIndex = 5
+    nameTag.Parent = skeletonContainer
     
     local healthBar = Instance.new("Frame")
     healthBar.Name = "HealthBar"
     healthBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     healthBar.BorderSizePixel = 0
-    healthBar.Position = UDim2.new(0, 0, -0.15, 0)
-    healthBar.Size = UDim2.new(1, 0, 0, 3)
+    healthBar.Position = UDim2.new(0, 0, -0.1, 0)
+    healthBar.Size = UDim2.new(1, 0, 0, 4)
     healthBar.Visible = false
-    healthBar.Parent = skeleton
+    healthBar.ZIndex = 5
+    healthBar.Parent = skeletonContainer
     
     local healthFill = Instance.new("Frame")
     healthFill.Name = "HealthFill"
     healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
     healthFill.BorderSizePixel = 0
     healthFill.Size = UDim2.new(0.7, 0, 1, 0)
+    healthFill.ZIndex = 6
     healthFill.Parent = healthBar
     
-    -- Toggle buttons
-    local toggleContainer = Instance.new("Frame")
-    toggleContainer.Name = "ToggleContainer"
-    toggleContainer.BackgroundTransparency = 1
-    toggleContainer.Position = UDim2.new(0, 0, 0.8, 0)
-    toggleContainer.Size = UDim2.new(1, 0, 0.2, 0)
-    toggleContainer.Parent = espPreview
+    local tracer = Instance.new("Frame")
+    tracer.Name = "Tracer"
+    tracer.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+    tracer.BorderSizePixel = 0
+    tracer.AnchorPoint = Vector2.new(0.5, 1)
+    tracer.Position = UDim2.new(0.5, 0, 1.8, 0)
+    tracer.Size = UDim2.new(0, 1, 0.5, 0)
+    tracer.Visible = false
+    tracer.ZIndex = 5
+    tracer.Parent = skeletonContainer
     
-    local toggleLayout = Instance.new("UIListLayout")
-    toggleLayout.FillDirection = Enum.FillDirection.Horizontal
-    toggleLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    toggleLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    toggleLayout.Padding = UDim.new(0, 5)
-    toggleLayout.Parent = toggleContainer
+    -- ESP status display
+    local statusFrame = Instance.new("Frame")
+    statusFrame.Name = "StatusFrame"
+    statusFrame.BackgroundTransparency = 1
+    statusFrame.Position = UDim2.new(0, 0, 0.75, 0)
+    statusFrame.Size = UDim2.new(1, 0, 0.25, 0)
+    statusFrame.Parent = espPreview
     
-    -- Toggle buttons
-    local function createToggleButton(text, callback)
-        local button = Instance.new("TextButton")
-        button.BackgroundColor3 = theme.SchemeColor or Color3.fromRGB(74, 99, 135)
-        button.Size = UDim2.new(0, 50, 0, 20)
-        button.AutoButtonColor = false
-        button.Font = Enum.Font.Gotham
-        button.Text = text
-        button.TextColor3 = theme.TextColor or Color3.fromRGB(255, 255, 255)
-        button.TextSize = 10
-        button.Parent = toggleContainer
-        
-        local buttonCorner = Instance.new("UICorner")
-        buttonCorner.CornerRadius = UDim.new(0, 4)
-        buttonCorner.Parent = button
-        
-        button.MouseButton1Click:Connect(function()
-            pcall(callback, button)
-        end)
-        
-        return button
-    end
+    local statusLayout = Instance.new("UIListLayout")
+    statusLayout.FillDirection = Enum.FillDirection.Vertical
+    statusLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    statusLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+    statusLayout.Padding = UDim.new(0, 2)
+    statusLayout.Parent = statusFrame
     
-    -- ESP toggle states
+    -- ESP status labels
+    local boxStatus = Instance.new("TextLabel")
+    boxStatus.Name = "BoxStatus"
+    boxStatus.BackgroundTransparency = 1
+    boxStatus.Size = UDim2.new(1, 0, 0, 15)
+    boxStatus.Font = Enum.Font.Gotham
+    boxStatus.Text = "Box ESP: OFF"
+    boxStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    boxStatus.TextSize = 11
+    boxStatus.TextXAlignment = Enum.TextXAlignment.Left
+    boxStatus.Parent = statusFrame
+    
+    local nameStatus = Instance.new("TextLabel")
+    nameStatus.Name = "NameStatus"
+    nameStatus.BackgroundTransparency = 1
+    nameStatus.Size = UDim2.new(1, 0, 0, 15)
+    nameStatus.Font = Enum.Font.Gotham
+    nameStatus.Text = "Name ESP: OFF"
+    nameStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    nameStatus.TextSize = 11
+    nameStatus.TextXAlignment = Enum.TextXAlignment.Left
+    nameStatus.Parent = statusFrame
+    
+    local healthStatus = Instance.new("TextLabel")
+    healthStatus.Name = "HealthStatus"
+    healthStatus.BackgroundTransparency = 1
+    healthStatus.Size = UDim2.new(1, 0, 0, 15)
+    healthStatus.Font = Enum.Font.Gotham
+    healthStatus.Text = "Health ESP: OFF"
+    healthStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    healthStatus.TextSize = 11
+    healthStatus.TextXAlignment = Enum.TextXAlignment.Left
+    healthStatus.Parent = statusFrame
+    
+    local tracerStatus = Instance.new("TextLabel")
+    tracerStatus.Name = "TracerStatus"
+    tracerStatus.BackgroundTransparency = 1
+    tracerStatus.Size = UDim2.new(1, 0, 0, 15)
+    tracerStatus.Font = Enum.Font.Gotham
+    tracerStatus.Text = "Tracers: OFF"
+    tracerStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    tracerStatus.TextSize = 11
+    tracerStatus.TextXAlignment = Enum.TextXAlignment.Left
+    tracerStatus.Parent = statusFrame
+    
+    -- ESP state management
     local espStates = {
         Box = false,
         Name = false,
-        Health = false
+        Health = false,
+        Tracer = false
     }
     
-    -- Create toggle buttons
-    local boxToggle = createToggleButton("Box", function(btn)
-        espStates.Box = not espStates.Box
-        boxESP.Visible = espStates.Box
-        btn.BackgroundColor3 = espStates.Box and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
-    end)
-    
-    local nameToggle = createToggleButton("Name", function(btn)
-        espStates.Name = not espStates.Name
-        nameTag.Visible = espStates.Name
-        btn.BackgroundColor3 = espStates.Name and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
-    end)
-    
-    local healthToggle = createToggleButton("Health", function(btn)
-        espStates.Health = not espStates.Health
-        healthBar.Visible = espStates.Health
-        btn.BackgroundColor3 = espStates.Health and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
-    end)
+    local espColors = {
+        Box = Color3.fromRGB(0, 255, 0),
+        Name = Color3.fromRGB(255, 255, 255),
+        Health = Color3.fromRGB(0, 255, 0),
+        Tracer = Color3.fromRGB(255, 255, 0)
+    }
     
     local previewInterface = {}
+    
+    function previewInterface:UpdateESP(type, enabled, color)
+        if type == "Box" then
+            espStates.Box = enabled
+            boxESP.Visible = enabled
+            if color then 
+                espColors.Box = color
+                boxESP.BorderColor3 = color
+            end
+            boxStatus.Text = "Box ESP: " .. (enabled and "ON" or "OFF")
+            boxStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            
+        elseif type == "Name" then
+            espStates.Name = enabled
+            nameTag.Visible = enabled
+            if color then 
+                espColors.Name = color
+                nameTag.TextColor3 = color
+            end
+            nameStatus.Text = "Name ESP: " .. (enabled and "ON" or "OFF")
+            nameStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            
+        elseif type == "Health" then
+            espStates.Health = enabled
+            healthBar.Visible = enabled
+            if color then 
+                espColors.Health = color
+                healthFill.BackgroundColor3 = color
+            end
+            healthStatus.Text = "Health ESP: " .. (enabled and "ON" or "OFF")
+            healthStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            
+        elseif type == "Tracer" then
+            espStates.Tracer = enabled
+            tracer.Visible = enabled
+            if color then 
+                espColors.Tracer = color
+                tracer.BackgroundColor3 = color
+            end
+            tracerStatus.Text = "Tracers: " .. (enabled and "ON" or "OFF")
+            tracerStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        end
+    end
+    
+    function previewInterface:SetESPColor(type, color)
+        if type == "Box" and espStates.Box then
+            boxESP.BorderColor3 = color
+            espColors.Box = color
+        elseif type == "Name" and espStates.Name then
+            nameTag.TextColor3 = color
+            espColors.Name = color
+        elseif type == "Health" and espStates.Health then
+            healthFill.BackgroundColor3 = color
+            espColors.Health = color
+        elseif type == "Tracer" and espStates.Tracer then
+            tracer.BackgroundColor3 = color
+            espColors.Tracer = color
+        end
+    end
     
     function previewInterface:Toggle()
         espPreview.Visible = not espPreview.Visible
@@ -212,23 +358,18 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     
     function previewInterface:UpdateTheme(newTheme)
         espPreview.BackgroundColor3 = newTheme.Header
+        previewTitle.BackgroundColor3 = newTheme.SchemeColor
         previewTitle.TextColor3 = newTheme.TextColor
-        previewArea.BackgroundColor3 = newTheme.Background
         
-        -- Update toggle buttons if not active
-        if not espStates.Box then
-            boxToggle.BackgroundColor3 = newTheme.SchemeColor
-        end
-        if not espStates.Name then
-            nameToggle.BackgroundColor3 = newTheme.SchemeColor
-        end
-        if not espStates.Health then
-            healthToggle.BackgroundColor3 = newTheme.SchemeColor
-        end
-        
-        boxToggle.TextColor3 = newTheme.TextColor
-        nameToggle.TextColor3 = newTheme.TextColor
-        healthToggle.TextColor3 = newTheme.TextColor
+        -- Update status text colors
+        boxStatus.TextColor3 = espStates.Box and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        nameStatus.TextColor3 = espStates.Name and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        healthStatus.TextColor3 = espStates.Health and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        tracerStatus.TextColor3 = espStates.Tracer and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+    end
+    
+    function previewInterface:GetStates()
+        return espStates
     end
     
     return previewInterface
@@ -554,6 +695,18 @@ function Kavo.CreateLib(kavName, themeInput)
     
     function publicMethods:HideESPPreview()
         espPreview:SetVisible(false)
+    end
+    
+    function publicMethods:UpdateESPPreview(espType, enabled, color)
+        espPreview:UpdateESP(espType, enabled, color)
+    end
+    
+    function publicMethods:SetESPColor(espType, color)
+        espPreview:SetESPColor(espType, color)
+    end
+    
+    function publicMethods:GetESPPreviewStates()
+        return espPreview:GetStates()
     end
     
     -- Tab system
