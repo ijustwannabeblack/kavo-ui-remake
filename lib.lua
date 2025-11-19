@@ -59,102 +59,71 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     espPreview.Parent = parentFrame
     espPreview.Visible = true
     espPreview.ZIndex = 10
+    espPreview.ClipsDescendants = true
     
     local previewCorner = Instance.new("UICorner")
-    previewCorner.CornerRadius = UDim.new(0, 4)
+    previewCorner.CornerRadius = UDim.new(0, 6)
     previewCorner.Parent = espPreview
     
     local previewTitle = Instance.new("TextLabel")
     previewTitle.Name = "PreviewTitle"
     previewTitle.BackgroundColor3 = theme.SchemeColor or Color3.fromRGB(74, 99, 135)
-    previewTitle.Size = UDim2.new(1, 0, 0, 25)
-    previewTitle.Font = Enum.Font.Gotham
-    previewTitle.Text = "ESP Preview"
+    previewTitle.Size = UDim2.new(1, 0, 0, 30)
+    previewTitle.Font = Enum.Font.GothamBold
+    previewTitle.Text = "ESP PREVIEW"
     previewTitle.TextColor3 = theme.TextColor or Color3.fromRGB(255, 255, 255)
     previewTitle.TextSize = 14
     previewTitle.Parent = espPreview
     
     local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 4)
+    titleCorner.CornerRadius = UDim.new(0, 6)
     titleCorner.Parent = previewTitle
     
     -- Preview area
     local previewArea = Instance.new("Frame")
     previewArea.Name = "PreviewArea"
-    previewArea.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    previewArea.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
     previewArea.Position = UDim2.new(0.05, 0, 0.15, 0)
     previewArea.Size = UDim2.new(0.9, 0, 0.55, 0)
     previewArea.Parent = espPreview
+    previewArea.ClipsDescendants = true
     
     local areaCorner = Instance.new("UICorner")
     areaCorner.CornerRadius = UDim.new(0, 4)
     areaCorner.Parent = previewArea
     
-    -- Minecraft skeleton image representation
+    -- Minecraft skeleton representation
     local skeletonContainer = Instance.new("Frame")
     skeletonContainer.Name = "SkeletonContainer"
     skeletonContainer.BackgroundTransparency = 1
     skeletonContainer.Size = UDim2.new(1, 0, 1, 0)
     skeletonContainer.Parent = previewArea
     
-    -- Create a simple representation of the Minecraft skeleton
-    -- Head
-    local head = Instance.new("Frame")
-    head.Name = "Head"
-    head.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    head.BorderSizePixel = 0
-    head.AnchorPoint = Vector2.new(0.5, 0)
-    head.Position = UDim2.new(0.5, 0, 0.1, 0)
-    head.Size = UDim2.new(0, 30, 0, 30)
-    head.Parent = skeletonContainer
+    -- Create Minecraft skeleton parts
+    local function createBone(name, color, size, position)
+        local bone = Instance.new("Frame")
+        bone.Name = name
+        bone.BackgroundColor3 = color
+        bone.BorderSizePixel = 0
+        bone.Size = size
+        bone.Position = position
+        bone.Parent = skeletonContainer
+        return bone
+    end
     
-    -- Body
-    local body = Instance.new("Frame")
-    body.Name = "Body"
-    body.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
-    body.BorderSizePixel = 0
-    body.AnchorPoint = Vector2.new(0.5, 0)
-    body.Position = UDim2.new(0.5, 0, 0.35, 0)
-    body.Size = UDim2.new(0, 20, 0, 40)
-    body.Parent = skeletonContainer
+    -- Head (8x8 pixels in Minecraft)
+    local head = createBone("Head", Color3.fromRGB(200, 200, 200), UDim2.new(0, 32, 0, 32), UDim2.new(0.35, 0, 0.1, 0))
     
-    -- Arms
-    local leftArm = Instance.new("Frame")
-    leftArm.Name = "LeftArm"
-    leftArm.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
-    leftArm.BorderSizePixel = 0
-    leftArm.AnchorPoint = Vector2.new(1, 0)
-    leftArm.Position = UDim2.new(0.5, -10, 0.35, 0)
-    leftArm.Size = UDim2.new(0, 15, 0, 35)
-    leftArm.Parent = skeletonContainer
+    -- Body (8x12 pixels)
+    local body = createBone("Body", Color3.fromRGB(150, 150, 150), UDim2.new(0, 24, 0, 48), UDim2.new(0.38, 0, 0.35, 0))
     
-    local rightArm = Instance.new("Frame")
-    rightArm.Name = "RightArm"
-    rightArm.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
-    rightArm.BorderSizePixel = 0
-    rightArm.AnchorPoint = Vector2.new(0, 0)
-    rightArm.Position = UDim2.new(0.5, 10, 0.35, 0)
-    rightArm.Size = UDim2.new(0, 15, 0, 35)
-    rightArm.Parent = skeletonContainer
+    -- Arms (4x12 pixels each)
+    local leftArm = createBone("LeftArm", Color3.fromRGB(150, 150, 150), UDim2.new(0, 16, 0, 48), UDim2.new(0.2, 0, 0.35, 0))
+    local rightArm = createBone("RightArm", Color3.fromRGB(150, 150, 150), UDim2.new(0, 16, 0, 48), UDim2.new(0.64, 0, 0.35, 0))
     
-    -- Legs
-    local leftLeg = Instance.new("Frame")
-    leftLeg.Name = "LeftLeg"
-    leftLeg.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
-    leftLeg.BorderSizePixel = 0
-    leftLeg.AnchorPoint = Vector2.new(1, 0)
-    leftLeg.Position = UDim2.new(0.5, -5, 0.7, 0)
-    leftLeg.Size = UDim2.new(0, 10, 0, 30)
-    leftLeg.Parent = skeletonContainer
-    
-    local rightLeg = Instance.new("Frame")
-    rightLeg.Name = "RightLeg"
-    rightLeg.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
-    rightLeg.BorderSizePixel = 0
-    rightLeg.AnchorPoint = Vector2.new(0, 0)
-    rightLeg.Position = UDim2.new(0.5, 5, 0.7, 0)
-    rightLeg.Size = UDim2.new(0, 10, 0, 30)
-    rightLeg.Parent = skeletonContainer
+    -- Legs (4x12 pixels each)
+    local leftLeg = createBone("LeftLeg", Color3.fromRGB(100, 100, 100), UDim2.new(0, 16, 0, 36), UDim2.new(0.3, 0, 0.75, 0))
+    local rightLeg = createBone("RightLeg", Color3.fromRGB(100, 100, 100), UDim2.new(0, 16, 0, 36), UDim2.new(0.54, 0, 0.75, 0))
     
     -- ESP elements (initially hidden)
     local boxESP = Instance.new("Frame")
@@ -162,7 +131,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     boxESP.BackgroundTransparency = 1
     boxESP.BorderColor3 = Color3.fromRGB(0, 255, 0)
     boxESP.BorderSizePixel = 2
-    boxESP.Size = UDim2.new(1.3, 0, 1.8, 0)
+    boxESP.Size = UDim2.new(1.2, 0, 1.8, 0)
     boxESP.AnchorPoint = Vector2.new(0.5, 0.5)
     boxESP.Position = UDim2.new(0.5, 0, 0.5, 0)
     boxESP.Visible = false
@@ -172,23 +141,26 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     local nameTag = Instance.new("TextLabel")
     nameTag.Name = "NameTag"
     nameTag.BackgroundTransparency = 1
-    nameTag.Position = UDim2.new(0, 0, -0.2, 0)
-    nameTag.Size = UDim2.new(1, 0, 0, 15)
+    nameTag.AnchorPoint = Vector2.new(0.5, 0.5)
+    nameTag.Position = UDim2.new(0.5, 0, -0.15, 0)
+    nameTag.Size = UDim2.new(1.5, 0, 0, 20)
     nameTag.Font = Enum.Font.GothamBold
     nameTag.Text = "Skeleton"
     nameTag.TextColor3 = Color3.fromRGB(255, 255, 255)
     nameTag.TextSize = 12
     nameTag.TextStrokeTransparency = 0
+    nameTag.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     nameTag.Visible = false
     nameTag.ZIndex = 5
     nameTag.Parent = skeletonContainer
     
     local healthBar = Instance.new("Frame")
     healthBar.Name = "HealthBar"
-    healthBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    healthBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     healthBar.BorderSizePixel = 0
-    healthBar.Position = UDim2.new(0, 0, -0.1, 0)
-    healthBar.Size = UDim2.new(1, 0, 0, 4)
+    healthBar.AnchorPoint = Vector2.new(0.5, 0.5)
+    healthBar.Position = UDim2.new(0.5, 0, -0.05, 0)
+    healthBar.Size = UDim2.new(0.8, 0, 0, 6)
     healthBar.Visible = false
     healthBar.ZIndex = 5
     healthBar.Parent = skeletonContainer
@@ -201,13 +173,17 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     healthFill.ZIndex = 6
     healthFill.Parent = healthBar
     
+    local healthCorner = Instance.new("UICorner")
+    healthCorner.CornerRadius = UDim.new(0, 2)
+    healthCorner.Parent = healthBar
+    
     local tracer = Instance.new("Frame")
     tracer.Name = "Tracer"
     tracer.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
     tracer.BorderSizePixel = 0
     tracer.AnchorPoint = Vector2.new(0.5, 1)
-    tracer.Position = UDim2.new(0.5, 0, 1.8, 0)
-    tracer.Size = UDim2.new(0, 1, 0.5, 0)
+    tracer.Position = UDim2.new(0.5, 0, 1.2, 0)
+    tracer.Size = UDim2.new(0, 2, 0.5, 0)
     tracer.Visible = false
     tracer.ZIndex = 5
     tracer.Parent = skeletonContainer
@@ -224,7 +200,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     statusLayout.FillDirection = Enum.FillDirection.Vertical
     statusLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
     statusLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-    statusLayout.Padding = UDim.new(0, 2)
+    statusLayout.Padding = UDim.new(0, 3)
     statusLayout.Parent = statusFrame
     
     -- ESP status labels
@@ -234,7 +210,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     boxStatus.Size = UDim2.new(1, 0, 0, 15)
     boxStatus.Font = Enum.Font.Gotham
     boxStatus.Text = "Box ESP: OFF"
-    boxStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    boxStatus.TextColor3 = Color3.fromRGB(255, 80, 80)
     boxStatus.TextSize = 11
     boxStatus.TextXAlignment = Enum.TextXAlignment.Left
     boxStatus.Parent = statusFrame
@@ -245,7 +221,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     nameStatus.Size = UDim2.new(1, 0, 0, 15)
     nameStatus.Font = Enum.Font.Gotham
     nameStatus.Text = "Name ESP: OFF"
-    nameStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    nameStatus.TextColor3 = Color3.fromRGB(255, 80, 80)
     nameStatus.TextSize = 11
     nameStatus.TextXAlignment = Enum.TextXAlignment.Left
     nameStatus.Parent = statusFrame
@@ -256,7 +232,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     healthStatus.Size = UDim2.new(1, 0, 0, 15)
     healthStatus.Font = Enum.Font.Gotham
     healthStatus.Text = "Health ESP: OFF"
-    healthStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    healthStatus.TextColor3 = Color3.fromRGB(255, 80, 80)
     healthStatus.TextSize = 11
     healthStatus.TextXAlignment = Enum.TextXAlignment.Left
     healthStatus.Parent = statusFrame
@@ -267,7 +243,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
     tracerStatus.Size = UDim2.new(1, 0, 0, 15)
     tracerStatus.Font = Enum.Font.Gotham
     tracerStatus.Text = "Tracers: OFF"
-    tracerStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+    tracerStatus.TextColor3 = Color3.fromRGB(255, 80, 80)
     tracerStatus.TextSize = 11
     tracerStatus.TextXAlignment = Enum.TextXAlignment.Left
     tracerStatus.Parent = statusFrame
@@ -298,7 +274,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
                 boxESP.BorderColor3 = color
             end
             boxStatus.Text = "Box ESP: " .. (enabled and "ON" or "OFF")
-            boxStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            boxStatus.TextColor3 = enabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
             
         elseif type == "Name" then
             espStates.Name = enabled
@@ -308,7 +284,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
                 nameTag.TextColor3 = color
             end
             nameStatus.Text = "Name ESP: " .. (enabled and "ON" or "OFF")
-            nameStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            nameStatus.TextColor3 = enabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
             
         elseif type == "Health" then
             espStates.Health = enabled
@@ -318,7 +294,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
                 healthFill.BackgroundColor3 = color
             end
             healthStatus.Text = "Health ESP: " .. (enabled and "ON" or "OFF")
-            healthStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            healthStatus.TextColor3 = enabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
             
         elseif type == "Tracer" then
             espStates.Tracer = enabled
@@ -328,7 +304,7 @@ function Kavo:CreateESPPreview(parentFrame, theme)
                 tracer.BackgroundColor3 = color
             end
             tracerStatus.Text = "Tracers: " .. (enabled and "ON" or "OFF")
-            tracerStatus.TextColor3 = enabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+            tracerStatus.TextColor3 = enabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
         end
     end
     
@@ -362,15 +338,18 @@ function Kavo:CreateESPPreview(parentFrame, theme)
         previewTitle.TextColor3 = newTheme.TextColor
         
         -- Update status text colors
-        boxStatus.TextColor3 = espStates.Box and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
-        nameStatus.TextColor3 = espStates.Name and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
-        healthStatus.TextColor3 = espStates.Health and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
-        tracerStatus.TextColor3 = espStates.Tracer and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        boxStatus.TextColor3 = espStates.Box and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+        nameStatus.TextColor3 = espStates.Name and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+        healthStatus.TextColor3 = espStates.Health and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+        tracerStatus.TextColor3 = espStates.Tracer and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
     end
     
     function previewInterface:GetStates()
         return espStates
     end
+    
+    -- Force show the preview
+    espPreview.Visible = true
     
     return previewInterface
 end
@@ -511,7 +490,7 @@ function Kavo.CreateLib(kavName, themeInput)
     Main.Name = "Main"
     Main.BackgroundColor3 = currentTheme.Background
     Main.ClipsDescendants = true
-    Main.Position = UDim2.new(0.336, 0, 0.275, 0)
+    Main.Position = UDim2.new(0.3, 0, 0.25, 0)
     Main.Size = UDim2.new(0, 525, 0, 318)
     Main.Parent = ScreenGui
     
@@ -626,18 +605,7 @@ function Kavo.CreateLib(kavName, themeInput)
     infoContainer.Size = UDim2.new(0, 368, 0, 33)
     infoContainer.Parent = Main
     
-    -- Blur frame
-    local blurFrame = Instance.new("Frame")
-    blurFrame.Name = "blurFrame"
-    blurFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-    blurFrame.BackgroundTransparency = 1
-    blurFrame.BorderSizePixel = 0
-    blurFrame.Position = UDim2.new(-0.022, 0, -0.037, 0)
-    blurFrame.Size = UDim2.new(0, 376, 0, 289)
-    blurFrame.ZIndex = 999
-    blurFrame.Parent = pages
-    
-    -- Create ESP Preview
+    -- Create ESP Preview (FORCE SHOW)
     local espPreview = Kavo:CreateESPPreview(Main, currentTheme)
     
     -- Enable dragging
