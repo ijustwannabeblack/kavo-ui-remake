@@ -1,107 +1,101 @@
--- Splix UI Library
--- Cleaner, optimized version
-
+-- Fixed UI Library
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
 
--- Theme
-local Theme = {
-    Accent = Color3.fromRGB(50, 100, 255),
-    LightContrast = Color3.fromRGB(30, 30, 30),
-    DarkContrast = Color3.fromRGB(20, 20, 20),
-    Outline = Color3.fromRGB(0, 0, 0),
-    Inline = Color3.fromRGB(50, 50, 50),
-    TextColor = Color3.fromRGB(255, 255, 255),
-    TextBorder = Color3.fromRGB(0, 0, 0),
-    Font = 2,
-    TextSize = 13
-}
+local Library = {}
+Library.__index = Library
 
--- Utility functions
-local Utility = {}
-
-function Utility:CreateDrawing(type, properties)
-    local drawing = Drawing.new(type)
-    for prop, value in pairs(properties) do
-        drawing[prop] = value
-    end
-    return drawing
+-- Safe utility functions
+local function SafeCreateDrawing(type, properties)
+    local success, drawing = pcall(function()
+        local draw = Drawing.new(type)
+        for prop, value in pairs(properties) do
+            if draw[prop] ~= nil then
+                draw[prop] = value
+            end
+        end
+        return draw
+    end)
+    return success and drawing or nil
 end
 
-function Utility:MouseOver(position, size)
-    local mouse = UserInputService:GetMouseLocation()
-    return mouse.X >= position.X and mouse.X <= position.X + size.X and
-           mouse.Y >= position.Y and mouse.Y <= position.Y + size.Y
+local function SafeMouseOver(position, size)
+    local success, result = pcall(function()
+        local mouse = UserInputService:GetMouseLocation()
+        return mouse.X >= position.X and mouse.X <= position.X + size.X and
+               mouse.Y >= position.Y and mouse.Y <= position.Y + size.Y
+    end)
+    return success and result or false
 end
-
-function Utility:Lerp(a, b, t)
-    return a + (b - a) * t
-end
-
--- UI Library
-local Library = {Windows = {}, Elements = {}}
 
 function Library:CreateWindow(config)
+    config = config or {}
     local window = {
         Name = config.Name or "UI",
-        Size = config.Size or Vector2.new(500, 600),
+        Size = config.Size or Vector2.new(500, 400),
         Pages = {},
         IsOpen = false,
-        Accent = config.Accent or Theme.Accent
+        Elements = {}
     }
     
-    -- Main window frame
-    window.MainFrame = Utility:CreateDrawing("Square", {
-        Color = Theme.Outline,
+    -- Safe drawing creation
+    window.MainFrame = SafeCreateDrawing("Square", {
+        Color = Color3.new(0, 0, 0),
         Filled = true,
         Size = window.Size,
-        Position = Vector2.new(
-            (workspace.CurrentCamera.ViewportSize.X - window.Size.X) / 2,
-            (workspace.CurrentCamera.ViewportSize.Y - window.Size.Y) / 2
-        ),
+        Position = Vector2.new(100, 100),
         Visible = false
     })
     
-    -- Inner frames
-    window.InnerFrame = Utility:CreateDrawing("Square", {
-        Color = Theme.LightContrast,
-        Filled = true,
-        Size = window.Size - Vector2.new(4, 4),
-        Position = window.MainFrame.Position + Vector2.new(2, 2),
-        Visible = false
-    })
+    if window.MainFrame then
+        window.InnerFrame = SafeCreateDrawing("Square", {
+            Color = Color3.new(0.1, 0.1, 0.1),
+            Filled = true,
+            Size = window.Size - Vector2.new(4, 4),
+            Position = window.MainFrame.Position + Vector2.new(2, 2),
+            Visible = false
+        })
+        
+        window.Title = SafeCreateDrawing("Text", {
+            Text = window.Name,
+            Color = Color3.new(1, 1, 1),
+            Size = 13,
+            Position = window.InnerFrame.Position + Vector2.new(10, 8),
+            Visible = false
+        })
+    end
     
-    -- Title
-    window.Title = Utility:CreateDrawing("Text", {
-        Text = window.Name,
-        Color = Theme.TextColor,
-        Size = Theme.TextSize,
-        Position = window.InnerFrame.Position + Vector2.new(10, 8),
-        Visible = false
-    })
+    -- Safe toggle function
+    function window:Toggle()
+        self.IsOpen = not self.IsOpen
+        if self.MainFrame then
+            self.MainFrame.Visible = self.IsOpen
+            if self.InnerFrame then self.InnerFrame.Visible = self.IsOpen end
+            if self.Title then self.Title.Visible = self.IsOpen end
+        end
+        
+        -- Safe page visibility update
+        for _, page in pairs(self.Pages) do
+            if page and type(page.UpdateVisibility) == "function" then
+                pcall(page.UpdateVisibility, page, self.IsOpen)
+            end
+        end
+    end
     
-    -- Toggle key
-    window.ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift
-    
-    -- Input handling
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == window.ToggleKey then
-            window:Toggle()
+    -- Input handling with error protection
+    local inputConnection
+    inputConnection = UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == (config.ToggleKey or Enum.KeyCode.RightShift) then
+            pcall(function()
+                window:Toggle()
+            end)
         end
     end)
     
-    function window:Toggle()
-        self.IsOpen = not self.IsOpen
-        self.MainFrame.Visible = self.IsOpen
-        self.InnerFrame.Visible = self.IsOpen
-        self.Title.Visible = self.IsOpen
-        
-        for _, page in pairs(self.Pages) do
-            page:UpdateVisibility(self.IsOpen)
-        end
-    end
+    -- Store connection for cleanup
+    window._connections = {inputConnection}
     
     function window:AddPage(name)
         local page = {
@@ -110,26 +104,45 @@ function Library:CreateWindow(config)
             Window = self
         }
         
-        -- Page button would go here
-        -- Section management would go here
+        function page:UpdateVisibility(visible)
+            -- Safe visibility update for page elements
+            for _, section in pairs(self.Sections) do
+                if section and section.Elements then
+                    for _, element in pairs(section.Elements) do
+                        if element and element.drawing then
+                            pcall(function()
+                                element.drawing.Visible = visible
+                            end)
+                        end
+                    end
+                end
+            end
+        end
         
-        function page:AddSection(name, side)
+        function page:AddSection(name)
             local section = {
                 Name = name,
-                Side = side or "left",
                 Elements = {}
             }
             
             function section:AddLabel(text)
                 local label = {
                     Type = "Label",
-                    Text = text
+                    Text = text,
+                    drawing = SafeCreateDrawing("Text", {
+                        Text = text,
+                        Color = Color3.new(1, 1, 1),
+                        Size = 12,
+                        Position = Vector2.new(20, 50 + (#self.Elements * 25)),
+                        Visible = window.IsOpen
+                    })
                 }
                 table.insert(self.Elements, label)
                 return label
             end
             
             function section:AddToggle(config)
+                config = config or {}
                 local toggle = {
                     Type = "Toggle",
                     Name = config.Name or "Toggle",
@@ -139,7 +152,7 @@ function Library:CreateWindow(config)
                 
                 function toggle:Set(value)
                     self.Value = value
-                    self.Callback(value)
+                    pcall(self.Callback, value)
                 end
                 
                 function toggle:Get()
@@ -150,7 +163,20 @@ function Library:CreateWindow(config)
                 return toggle
             end
             
+            function section:AddButton(config)
+                config = config or {}
+                local button = {
+                    Type = "Button",
+                    Name = config.Name or "Button",
+                    Callback = config.Callback or function() end
+                }
+                
+                table.insert(self.Elements, button)
+                return button
+            end
+            
             function section:AddSlider(config)
+                config = config or {}
                 local slider = {
                     Type = "Slider",
                     Name = config.Name or "Slider",
@@ -162,7 +188,7 @@ function Library:CreateWindow(config)
                 
                 function slider:Set(value)
                     self.Value = math.clamp(value, self.Min, self.Max)
-                    self.Callback(self.Value)
+                    pcall(self.Callback, self.Value)
                 end
                 
                 function slider:Get()
@@ -173,42 +199,7 @@ function Library:CreateWindow(config)
                 return slider
             end
             
-            function section:AddButton(config)
-                local button = {
-                    Type = "Button",
-                    Name = config.Name or "Button",
-                    Callback = config.Callback or function() end
-                }
-                
-                table.insert(self.Elements, button)
-                return button
-            end
-            
-            function section:AddDropdown(config)
-                local dropdown = {
-                    Type = "Dropdown",
-                    Name = config.Name or "Dropdown",
-                    Options = config.Options or {"Option 1", "Option 2"},
-                    Value = config.Default or config.Options[1],
-                    Callback = config.Callback or function() end
-                }
-                
-                function dropdown:Set(value)
-                    if table.find(self.Options, value) then
-                        self.Value = value
-                        self.Callback(value)
-                    end
-                end
-                
-                function dropdown:Get()
-                    return self.Value
-                end
-                
-                table.insert(self.Elements, dropdown)
-                return dropdown
-            end
-            
-            table.insert(page.Sections, section)
+            table.insert(self.Sections, section)
             return section
         end
         
@@ -216,67 +207,41 @@ function Library:CreateWindow(config)
         return page
     end
     
-    table.insert(Library.Windows, window)
+    function window:Destroy()
+        -- Safe cleanup
+        for _, conn in pairs(self._connections or {}) do
+            pcall(function() conn:Disconnect() end)
+        end
+        
+        local drawings = {self.MainFrame, self.InnerFrame, self.Title}
+        for _, drawing in pairs(drawings) do
+            if drawing then
+                pcall(function() drawing:Remove() end)
+            end
+        end
+        
+        for _, page in pairs(self.Pages) do
+            if page and page.Sections then
+                for _, section in pairs(page.Sections) do
+                    if section and section.Elements then
+                        for _, element in pairs(section.Elements) do
+                            if element and element.drawing then
+                                pcall(function() element.drawing:Remove() end)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    table.insert(Library.Elements, window)
     return window
 end
 
--- Example usage:
-local MyWindow = Library:CreateWindow({
-    Name = "Splix UI",
-    Size = Vector2.new(500, 400),
-    ToggleKey = Enum.KeyCode.Insert
-})
-
-local MainPage = MyWindow:AddPage("Main")
-local CombatSection = MainPage:AddSection("Combat")
-
-local AimbotToggle = CombatSection:AddToggle({
-    Name = "Aimbot",
-    Default = true,
-    Callback = function(value)
-        print("Aimbot:", value)
-    end
-})
-
-local FOVSlider = CombatSection:AddSlider({
-    Name = "Field of View",
-    Default = 90,
-    Min = 1,
-    Max = 360,
-    Callback = function(value)
-        print("FOV:", value)
-    end
-})
-
-local VisualsSection = MainPage:AddSection("Visuals", "right")
-
-local ESPToggle = VisualsSection:AddToggle({
-    Name = "ESP",
-    Default = false,
-    Callback = function(value)
-        print("ESP:", value)
-    end
-})
-
-local ThemeDropdown = VisualsSection:AddDropdown({
-    Name = "Theme",
-    Options = {"Dark", "Light", "Blue", "Red"},
-    Default = "Dark",
-    Callback = function(value)
-        print("Theme:", value)
-    end
-})
-
-local MiscSection = MainPage:AddSection("Miscellaneous")
-
-local SaveButton = MiscSection:AddButton({
-    Name = "Save Config",
-    Callback = function()
-        print("Config saved!")
-    end
-})
-
--- Open the window
-MyWindow:Toggle()
+-- Safe initialization
+function Library:Init()
+    print("UI Library initialized safely")
+end
 
 return Library
