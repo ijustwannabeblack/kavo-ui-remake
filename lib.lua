@@ -1,4 +1,4 @@
--- Completely Fixed Kavo UI Library
+-- Completely Fixed Kavo UI Library with ESP Preview
 local Kavo = {}
 
 local tween = game:GetService("TweenService")
@@ -46,6 +46,192 @@ function Kavo:DraggingEnabled(frame, parent)
             )
         end
     end)
+end
+
+-- ESP Preview System
+function Kavo:CreateESPPreview(parentFrame, theme)
+    local espPreview = Instance.new("Frame")
+    espPreview.Name = "ESPPreview"
+    espPreview.BackgroundColor3 = theme.Header or Color3.fromRGB(28, 29, 34)
+    espPreview.BorderSizePixel = 0
+    espPreview.Size = UDim2.new(0, 180, 0, 220)
+    espPreview.Position = UDim2.new(1, 10, 0, 0)
+    espPreview.Parent = parentFrame
+    espPreview.Visible = false
+    
+    local previewCorner = Instance.new("UICorner")
+    previewCorner.CornerRadius = UDim.new(0, 4)
+    previewCorner.Parent = espPreview
+    
+    local previewTitle = Instance.new("TextLabel")
+    previewTitle.Name = "PreviewTitle"
+    previewTitle.BackgroundTransparency = 1
+    previewTitle.Position = UDim2.new(0, 0, 0, 5)
+    previewTitle.Size = UDim2.new(1, 0, 0, 20)
+    previewTitle.Font = Enum.Font.Gotham
+    previewTitle.Text = "ESP Preview"
+    previewTitle.TextColor3 = theme.TextColor or Color3.fromRGB(255, 255, 255)
+    previewTitle.TextSize = 14
+    previewTitle.Parent = espPreview
+    
+    -- Preview area
+    local previewArea = Instance.new("Frame")
+    previewArea.Name = "PreviewArea"
+    previewArea.BackgroundColor3 = theme.Background or Color3.fromRGB(36, 37, 43)
+    previewArea.Position = UDim2.new(0.05, 0, 0.15, 0)
+    previewArea.Size = UDim2.new(0.9, 0, 0.6, 0)
+    previewArea.Parent = espPreview
+    
+    local areaCorner = Instance.new("UICorner")
+    areaCorner.CornerRadius = UDim.new(0, 4)
+    areaCorner.Parent = previewArea
+    
+    -- Minecraft skeleton representation
+    local skeleton = Instance.new("Frame")
+    skeleton.Name = "Skeleton"
+    skeleton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    skeleton.BorderSizePixel = 0
+    skeleton.AnchorPoint = Vector2.new(0.5, 0.5)
+    skeleton.Position = UDim2.new(0.5, 0, 0.5, 0)
+    skeleton.Size = UDim2.new(0, 40, 0, 80)
+    skeleton.Parent = previewArea
+    
+    -- ESP elements (initially hidden)
+    local boxESP = Instance.new("Frame")
+    boxESP.Name = "BoxESP"
+    boxESP.BackgroundTransparency = 1
+    boxESP.BorderColor3 = Color3.fromRGB(0, 255, 0)
+    boxESP.BorderSizePixel = 2
+    boxESP.Size = UDim2.new(1.2, 0, 1.5, 0)
+    boxESP.AnchorPoint = Vector2.new(0.5, 0.5)
+    boxESP.Position = UDim2.new(0.5, 0, 0.5, 0)
+    boxESP.Visible = false
+    boxESP.Parent = skeleton
+    
+    local nameTag = Instance.new("TextLabel")
+    nameTag.Name = "NameTag"
+    nameTag.BackgroundTransparency = 1
+    nameTag.Position = UDim2.new(0, 0, -0.3, 0)
+    nameTag.Size = UDim2.new(1, 0, 0, 15)
+    nameTag.Font = Enum.Font.Gotham
+    nameTag.Text = "Skeleton"
+    nameTag.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameTag.TextSize = 10
+    nameTag.Visible = false
+    nameTag.Parent = skeleton
+    
+    local healthBar = Instance.new("Frame")
+    healthBar.Name = "HealthBar"
+    healthBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    healthBar.BorderSizePixel = 0
+    healthBar.Position = UDim2.new(0, 0, -0.15, 0)
+    healthBar.Size = UDim2.new(1, 0, 0, 3)
+    healthBar.Visible = false
+    healthBar.Parent = skeleton
+    
+    local healthFill = Instance.new("Frame")
+    healthFill.Name = "HealthFill"
+    healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    healthFill.BorderSizePixel = 0
+    healthFill.Size = UDim2.new(0.7, 0, 1, 0)
+    healthFill.Parent = healthBar
+    
+    -- Toggle buttons
+    local toggleContainer = Instance.new("Frame")
+    toggleContainer.Name = "ToggleContainer"
+    toggleContainer.BackgroundTransparency = 1
+    toggleContainer.Position = UDim2.new(0, 0, 0.8, 0)
+    toggleContainer.Size = UDim2.new(1, 0, 0.2, 0)
+    toggleContainer.Parent = espPreview
+    
+    local toggleLayout = Instance.new("UIListLayout")
+    toggleLayout.FillDirection = Enum.FillDirection.Horizontal
+    toggleLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    toggleLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    toggleLayout.Padding = UDim.new(0, 5)
+    toggleLayout.Parent = toggleContainer
+    
+    -- Toggle buttons
+    local function createToggleButton(text, callback)
+        local button = Instance.new("TextButton")
+        button.BackgroundColor3 = theme.SchemeColor or Color3.fromRGB(74, 99, 135)
+        button.Size = UDim2.new(0, 50, 0, 20)
+        button.AutoButtonColor = false
+        button.Font = Enum.Font.Gotham
+        button.Text = text
+        button.TextColor3 = theme.TextColor or Color3.fromRGB(255, 255, 255)
+        button.TextSize = 10
+        button.Parent = toggleContainer
+        
+        local buttonCorner = Instance.new("UICorner")
+        buttonCorner.CornerRadius = UDim.new(0, 4)
+        buttonCorner.Parent = button
+        
+        button.MouseButton1Click:Connect(function()
+            pcall(callback, button)
+        end)
+        
+        return button
+    end
+    
+    -- ESP toggle states
+    local espStates = {
+        Box = false,
+        Name = false,
+        Health = false
+    }
+    
+    -- Create toggle buttons
+    local boxToggle = createToggleButton("Box", function(btn)
+        espStates.Box = not espStates.Box
+        boxESP.Visible = espStates.Box
+        btn.BackgroundColor3 = espStates.Box and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
+    end)
+    
+    local nameToggle = createToggleButton("Name", function(btn)
+        espStates.Name = not espStates.Name
+        nameTag.Visible = espStates.Name
+        btn.BackgroundColor3 = espStates.Name and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
+    end)
+    
+    local healthToggle = createToggleButton("Health", function(btn)
+        espStates.Health = not espStates.Health
+        healthBar.Visible = espStates.Health
+        btn.BackgroundColor3 = espStates.Health and Color3.fromRGB(0, 255, 0) or theme.SchemeColor
+    end)
+    
+    local previewInterface = {}
+    
+    function previewInterface:Toggle()
+        espPreview.Visible = not espPreview.Visible
+    end
+    
+    function previewInterface:SetVisible(visible)
+        espPreview.Visible = visible
+    end
+    
+    function previewInterface:UpdateTheme(newTheme)
+        espPreview.BackgroundColor3 = newTheme.Header
+        previewTitle.TextColor3 = newTheme.TextColor
+        previewArea.BackgroundColor3 = newTheme.Background
+        
+        -- Update toggle buttons if not active
+        if not espStates.Box then
+            boxToggle.BackgroundColor3 = newTheme.SchemeColor
+        end
+        if not espStates.Name then
+            nameToggle.BackgroundColor3 = newTheme.SchemeColor
+        end
+        if not espStates.Health then
+            healthToggle.BackgroundColor3 = newTheme.SchemeColor
+        end
+        
+        boxToggle.TextColor3 = newTheme.TextColor
+        nameToggle.TextColor3 = newTheme.TextColor
+        healthToggle.TextColor3 = newTheme.TextColor
+    end
+    
+    return previewInterface
 end
 
 -- Default theme with all required properties
@@ -310,6 +496,9 @@ function Kavo.CreateLib(kavName, themeInput)
     blurFrame.ZIndex = 999
     blurFrame.Parent = pages
     
+    -- Create ESP Preview
+    local espPreview = Kavo:CreateESPPreview(Main, currentTheme)
+    
     -- Enable dragging
     Kavo:DraggingEnabled(MainHeader, Main)
     
@@ -340,17 +529,31 @@ function Kavo.CreateLib(kavName, themeInput)
     function publicMethods:ChangeColor(property, color)
         if currentTheme[property] and color then
             currentTheme[property] = color
+            espPreview:UpdateTheme(currentTheme)
         end
     end
     
     function publicMethods:ChangeTheme(newThemeInput)
         currentTheme = GetSafeTheme(newThemeInput)
+        espPreview:UpdateTheme(currentTheme)
     end
     
     function publicMethods:ToggleUI()
         if ScreenGui then
             ScreenGui.Enabled = not ScreenGui.Enabled
         end
+    end
+    
+    function publicMethods:ToggleESPPreview()
+        espPreview:Toggle()
+    end
+    
+    function publicMethods:ShowESPPreview()
+        espPreview:SetVisible(true)
+    end
+    
+    function publicMethods:HideESPPreview()
+        espPreview:SetVisible(false)
     end
     
     -- Tab system
@@ -603,6 +806,76 @@ function Kavo.CreateLib(kavName, themeInput)
                 end
                 
                 return labelInterface
+            end
+            
+            function sectionInterface:NewToggle(toggleName, defaultValue, callback)
+                toggleName = toggleName or "Toggle"
+                defaultValue = defaultValue or false
+                callback = callback or function() end
+                
+                local toggle = Instance.new("TextButton")
+                toggle.Name = "Toggle"
+                toggle.BackgroundColor3 = currentTheme.ElementColor
+                toggle.Size = UDim2.new(0, 352, 0, 33)
+                toggle.AutoButtonColor = false
+                toggle.Font = Enum.Font.SourceSans
+                toggle.Text = ""
+                toggle.TextSize = 14
+                toggle.Parent = sectionContent
+                
+                local toggleCorner = Instance.new("UICorner")
+                toggleCorner.CornerRadius = UDim.new(0, 4)
+                toggleCorner.Parent = toggle
+                
+                local toggleLabel = Instance.new("TextLabel")
+                toggleLabel.Name = "ToggleLabel"
+                toggleLabel.BackgroundTransparency = 1
+                toggleLabel.Position = UDim2.new(0.097, 0, 0.273, 0)
+                toggleLabel.Size = UDim2.new(0, 314, 0, 14)
+                toggleLabel.Font = Enum.Font.GothamSemibold
+                toggleLabel.Text = toggleName
+                toggleLabel.TextColor3 = currentTheme.TextColor
+                toggleLabel.TextSize = 14
+                toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+                toggleLabel.Parent = toggle
+                
+                local toggleIndicator = Instance.new("Frame")
+                toggleIndicator.Name = "ToggleIndicator"
+                toggleIndicator.BackgroundColor3 = defaultValue and currentTheme.SchemeColor or Color3.fromRGB(80, 80, 80)
+                toggleIndicator.Position = UDim2.new(0.9, 0, 0.2, 0)
+                toggleIndicator.Size = UDim2.new(0, 20, 0, 20)
+                toggleIndicator.Parent = toggle
+                
+                local indicatorCorner = Instance.new("UICorner")
+                indicatorCorner.CornerRadius = UDim.new(0, 4)
+                indicatorCorner.Parent = toggleIndicator
+                
+                local toggleState = defaultValue
+                
+                toggle.MouseButton1Click:Connect(function()
+                    toggleState = not toggleState
+                    Utility:TweenObject(toggleIndicator, {
+                        BackgroundColor3 = toggleState and currentTheme.SchemeColor or Color3.fromRGB(80, 80, 80)
+                    }, 0.2)
+                    pcall(callback, toggleState)
+                end)
+                
+                UpdateSectionSize()
+                
+                local toggleInterface = {}
+                function toggleInterface:SetValue(value)
+                    toggleState = value
+                    Utility:TweenObject(toggleIndicator, {
+                        BackgroundColor3 = toggleState and currentTheme.SchemeColor or Color3.fromRGB(80, 80, 80)
+                    }, 0.2)
+                    pcall(callback, toggleState)
+                end
+                
+                function toggleInterface:GetValue()
+                    return toggleState
+                end
+                
+                return toggleInterface
             end
             
             return sectionInterface
